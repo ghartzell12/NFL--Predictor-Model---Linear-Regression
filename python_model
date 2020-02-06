@@ -1,0 +1,107 @@
+# importing libraries for machine learning
+import csv
+import pandas as pd  
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn import linear_model
+from sklearn.linear_model import LinearRegression
+from sklearn.preprocessing import PolynomialFeatures
+
+
+# sigmoid function necessary for neural translation
+def sigmoid(x):
+    return 1 / (1 + np.exp(-x))
+
+# setting dataframe for each team
+dataset = pd.read_csv('nfl1.csv')
+dataframe = pd.DataFrame(dataset)
+f = open('tomb1212.csv','r')
+reader = csv.reader(f,quoting=csv.QUOTE_NONNUMERIC)
+
+# create dictionary - key is team,year val is stats (read through dataframe)
+teams = {}
+for row in reader:
+    row[0] = str(int(row[0]))
+    teams[row[0]] = row[4] , row[5] , row[6] ,  row[7] , row[8] ,\
+    row[9] , row[10] , row[11] , row[12] , row[13] , row[14] , row[15] \
+    , row[16] , row[17] , row[18] , row[19] , row[20] , row[21] , row[22]\
+    , row[23] , row[25] , row[26] ,  row[27] , row[28] ,\
+    row[29] , row[30] , row[31] , row[32] , row[33] , row[34] , row[35] \
+    , row[36] , row[37] , row[38] , row[39] , row[40] , row[41] , row[42]\
+    , row[43] , row[44], row[45], row[46] ,  row[47] , row[48] ,\
+    row[49] , row[50] , row[51] , row[52] , row[53] , row[54] , row[55] \
+    , row[56] , row[57] , row[58] , row[59] , row[60] , row[61] , row[62]\
+    , row[63] , row[64] , row[65] , row[66] , row[67] , row[68] , row[69]\
+    , row[70] , row[71] , row[72] , row[73]
+    
+#initiate training inputs/output arrays
+training_inputs = []
+training_outputs = []
+random_variables = []
+
+#open second sheet (inputs)
+df = open('tomb.csv','r')
+reader2 = csv.reader(df, quoting=csv.QUOTE_NONNUMERIC)
+
+#adding everything to training inputs
+for row in reader2:
+    # create v = each row of the array
+    v=[]
+    o = []
+    f=[]
+    # enter first values as each stat in team stats (0 is home,1 away)
+    row[0] = str(int(row[0]))
+    row[1] = str(int(row[1]))
+    for items in teams[row[0]]:
+        v.append(items)
+    for items in teams[row[1]]:
+        v.append(items)
+    # enter weather values
+    v.append(row[2])
+    v.append(row[3])
+    # error fixing
+    for nums in range(len(v)):
+        if(type(v[nums])!= float):
+            v[nums] = 14.67
+    # add each row (v) to the total array
+    training_inputs.append(v)
+    o.append(row[4])
+    training_outputs.append(o)
+    
+
+#formatting
+training_inputs = np.array(training_inputs)
+training_inputs = training_inputs.astype(float)
+training_outputs=np.array(training_outputs)
+training_outputs=training_outputs.astype(float)
+print(training_outputs.shape)
+f=training_inputs[1]
+#training
+m= []
+for item in teams['92018']:
+    m.append(item)
+for item in teams['322018']:
+    m.append(item)
+m.append(65)
+m.append(5)
+m=np.array(m)
+synaptic_weights = 2 * np.random.random((140,1))-1
+print(training_inputs.shape)
+lin_model = LinearRegression()
+lin_model.fit(training_inputs,training_outputs)
+intercept = lin_model.intercept_
+coef = lin_model.coef_
+print(training_inputs[1].shape)
+coef.reshape(-1,1)
+training_inputs[1].reshape(-1,1)
+test = coef*m
+sum = 0
+for item in test:
+   for vals in item:
+       sum = sum + vals
+print(sum + intercept)
+print(training_outputs[5])
+poly = PolynomialFeatures(degree = 4)
+poly.fit(training_inputs, training_outputs)
+
+
